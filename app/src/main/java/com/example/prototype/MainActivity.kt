@@ -1,5 +1,6 @@
 package com.example.prototype
 
+import android.content.ContentValues
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
@@ -35,8 +36,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun click(view: View) {
+        var col = 0;
+        var cursor = mDb!!.rawQuery("SELECT Count(*) FROM Question", null)
+        cursor.moveToFirst()
+        col = cursor.getInt(0)
+        cursor.close()
         var product = ""
-        val cursor = mDb!!.rawQuery("SELECT * FROM Question where _id =" + (1..31).random() + "", null)
+        cursor = mDb!!.rawQuery("SELECT * FROM Question where _id =" + (1..col).random() + "", null)
         cursor.moveToFirst()
         while (!cursor.isAfterLast) {
             product += cursor.getString(1)
@@ -61,5 +67,30 @@ class MainActivity : AppCompatActivity() {
         players.add(findViewById<EditText>(R.id.person).getText().toString())
         Toast.makeText(this, "Игрок " + findViewById<EditText>(R.id.person).getText().toString() + " добавлен", Toast.LENGTH_SHORT).show()
         findViewById<EditText>(R.id.person).setText("")
+    }
+
+    fun newQuestion(view: View){
+        if(!findViewById<EditText>(R.id.question).getText().toString().equals("")) {
+            val database: SQLiteDatabase = mDBHelper!!.getWritableDatabase()
+            val contentValues = ContentValues()
+            var col = 0;
+            val cursor = mDb!!.rawQuery("SELECT Count(*) FROM Question", null)
+            cursor.moveToFirst()
+            col = cursor.getInt(0)
+            cursor.close()
+            contentValues.put("_id", col + 1)
+            contentValues.put("text", findViewById<EditText>(R.id.question).getText().toString())
+            database.insert("Question", null, contentValues)
+            findViewById<TextView>(R.id.question).setText("")
+            Toast.makeText(this, "Сохранено", Toast.LENGTH_SHORT).show()
+        }
+
+        else{
+            Toast.makeText(this, "Пустое поле", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun winQuest(view: View){
+        setContentView(R.layout.question)
     }
 }
