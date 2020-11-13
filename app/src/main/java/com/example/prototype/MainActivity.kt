@@ -1,17 +1,20 @@
 package com.example.prototype
 
 import android.content.ContentValues
+import android.content.DialogInterface
+import android.content.Intent
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.zxing.integration.android.IntentIntegrator
 import java.io.IOException
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     private var mDBHelper: DatabaseHelper? = null
     private var mDb: SQLiteDatabase? = null
@@ -33,6 +36,19 @@ class MainActivity : AppCompatActivity() {
         } catch (mSQLException: SQLException) {
             throw mSQLException
         }
+
+       val scanBtn = findViewById<Button>(R.id.scanBtn)
+        val vkBtn = findViewById<ImageButton>(R.id.vkBtn)
+
+       scanBtn.setOnClickListener(this)
+
+        vkBtn.setOnClickListener(View.OnClickListener {
+            val browserIntent = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://vk.com/club200233275")
+            )
+            startActivity(browserIntent)
+        })
     }
 
     fun click(view: View) {
@@ -93,4 +109,46 @@ class MainActivity : AppCompatActivity() {
     fun winQuest(view: View){
         setContentView(R.layout.question)
     }
+
+    override fun onClick(v: View?) {
+        scanCode()
+    }
+
+    fun scanCode() {
+        val integrator = IntentIntegrator(this)
+        integrator.captureActivity = CaptureAct::class.java
+        integrator.setOrientationLocked(false)
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES)
+        integrator.setPrompt("Scanning Code")
+        integrator.initiateScan()
+    }
+
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
+        val result =
+            IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+        if (result != null) {
+            if (result.contents != null) {
+                val builder =
+                    AlertDialog.Builder(this)
+                builder.setMessage(result.contents)
+                builder.setTitle("Scanning Result")
+                builder.setPositiveButton(
+                    "Scan Again"
+                ) { dialog, which -> scanCode() }.setNegativeButton(
+                    "Finish"
+                ) { dialog, which -> finish() }
+                val dialog = builder.create()
+                dialog.show()
+            } else {
+                Toast.makeText(this, "No Results", Toast.LENGTH_LONG).show()
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
 }
+

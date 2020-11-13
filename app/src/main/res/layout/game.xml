@@ -5,31 +5,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:onClick="click"
+    android:background="@drawable/game_fon"
     tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/quest"
-        android:layout_width="364dp"
-        android:layout_height="286dp"
-        android:layout_marginStart="23dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="256dp"
+        android:layout_width="340dp"
+        android:layout_height="395dp"
+        android:fontFamily="sans-serif-black"
         android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.366"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/player"
         android:layout_width="359dp"
         android:layout_height="56dp"
-        android:layout_marginStart="22dp"
-        android:layout_marginTop="84dp"
-        android:layout_marginEnd="31dp"
+        android:fontFamily="sans-serif-condensed-medium"
         android:gravity="center"
+        android:textColor="#FFFFFF"
+        android:textSize="40sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.307"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.127" />
 </androidx.constraintlayout.widget.ConstraintLayout>
