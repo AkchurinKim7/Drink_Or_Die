@@ -1,20 +1,23 @@
 package com.example.prototype
 
 import android.content.ContentValues
-import android.content.DialogInterface
 import android.content.Intent
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
+import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.zxing.integration.android.IntentIntegrator
 import java.io.IOException
 
+
 class MainActivity : AppCompatActivity(), View.OnClickListener {
+    var layout = 0;
 
     private var mDBHelper: DatabaseHelper? = null
     private var mDb: SQLiteDatabase? = null
@@ -22,6 +25,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     var players: ArrayList<String> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        layout = 1;
         super.onCreate(savedInstanceState)
         setContentView(R.layout.start)
 
@@ -37,18 +41,35 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             throw mSQLException
         }
 
-       val scanBtn = findViewById<Button>(R.id.scanBtn)
+        val scanBtn = findViewById<Button>(R.id.scanBtn)
         val vkBtn = findViewById<ImageButton>(R.id.vkBtn)
 
-       scanBtn.setOnClickListener(this)
+        scanBtn.setOnClickListener(this)
 
         vkBtn.setOnClickListener(View.OnClickListener {
             val browserIntent = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("https://vk.com/club200233275")
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://vk.com/club200233275")
             )
             startActivity(browserIntent)
         })
+        getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+        );
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            when(layout){
+                1 -> android.os.Process.killProcess(android.os.Process.myPid())
+                2 -> {setContentView(R.layout.start)
+                    layout = 1}
+                3 -> {setContentView(R.layout.start)
+                    layout = 1}
+            }
+        }
+        return true
     }
 
     fun click(view: View) {
@@ -73,6 +94,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     fun start(view: View){
         if(players.size > 1) {
             setContentView(R.layout.game)
+            layout = 2
         }
         else{
             Toast.makeText(this, "Минимум 2 игрока", Toast.LENGTH_SHORT).show()
@@ -81,7 +103,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     fun add(view: View){
         players.add(findViewById<EditText>(R.id.person).getText().toString())
-        Toast.makeText(this, "Игрок " + findViewById<EditText>(R.id.person).getText().toString() + " добавлен", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+                this,
+                "Игрок " + findViewById<EditText>(R.id.person).getText().toString() + " добавлен",
+                Toast.LENGTH_SHORT
+        ).show()
         findViewById<EditText>(R.id.person).setText("")
     }
 
@@ -107,6 +133,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     fun winQuest(view: View){
+        layout = 3
         setContentView(R.layout.question)
     }
 
@@ -124,22 +151,22 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?
+            requestCode: Int,
+            resultCode: Int,
+            data: Intent?
     ) {
         val result =
-            IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+                IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {
             if (result.contents != null) {
                 val builder =
-                    AlertDialog.Builder(this)
+                        AlertDialog.Builder(this)
                 builder.setMessage(result.contents)
                 builder.setTitle("Scanning Result")
                 builder.setPositiveButton(
-                    "Scan Again"
+                        "Scan Again"
                 ) { dialog, which -> scanCode() }.setNegativeButton(
-                    "Finish"
+                        "Finish"
                 ) { dialog, which -> finish() }
                 val dialog = builder.create()
                 dialog.show()
